@@ -16,10 +16,12 @@ namespace OneByOne
         public const int BlockSize = 25;
         public static Block[,] Field = new Block[(int)Values.WindowSize.X / BlockSize, (int)Values.WindowSize.Y / BlockSize];
         public static Player ThisPlayer;
+        public static Enemy blob;
 
         public static void Load()
         {
             ThisPlayer = new Player(new Rectangle(0, 0, BlockSize, BlockSize));
+            blob = new Enemy(new Rectangle(100, 100, BlockSize, BlockSize));
 
             for (int x =0; x < Field.GetLength(0);x++){
                 for (int y = 0; y < Field.GetLength(1); y++ )
@@ -37,6 +39,7 @@ namespace OneByOne
         public static void Update()
         {
             ThisPlayer.Update();
+            blob.Update();
         }
 
         public static void Draw(SpriteBatch SB)
@@ -50,6 +53,7 @@ namespace OneByOne
 
             }
             ThisPlayer.Draw(SB);
+            blob.Draw(SB);
         }
 
         public static void TurnAllSelectedBlocksFilled() 

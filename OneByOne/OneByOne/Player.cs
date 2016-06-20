@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Media;
 
 namespace OneByOne
 {
-    public enum Direction { Top, Left, Right, Bottom }
+    public enum Direction { Up, Left, Right, Down }
     public class Player : Entity
     {
         Direction FacingDir;
@@ -32,10 +32,10 @@ namespace OneByOne
                 FacingDir = Direction.Left;
 
             if (Control.CurKS.IsKeyDown(Keys.S))
-                FacingDir = Direction.Bottom;
+                FacingDir = Direction.Down;
 
             if (Control.CurKS.IsKeyDown(Keys.W))
-                FacingDir = Direction.Top;
+                FacingDir = Direction.Up;
 
             if (Control.CurKS.IsKeyDown(Keys.D))
                 FacingDir = Direction.Right;
@@ -44,10 +44,10 @@ namespace OneByOne
                 FacingDir = Direction.Left;
 
             if (Control.CurKS.IsKeyDown(Keys.Down))
-                FacingDir = Direction.Bottom;
+                FacingDir = Direction.Down;
 
             if (Control.CurKS.IsKeyDown(Keys.Up))
-                FacingDir = Direction.Top;
+                FacingDir = Direction.Up;
 
             if (Control.CurKS.IsKeyDown(Keys.Right))
                 FacingDir = Direction.Right;
@@ -62,7 +62,7 @@ namespace OneByOne
         }
         public void SnapToGrid()
         {
-            if (FacingDir == Direction.Right || FacingDir == Direction.Left || !Moving )
+            if (FacingDir == Direction.Right || FacingDir == Direction.Left || !Moving && !IsCapturing)
             {
                 if (Rect.Y % LevelManager.BlockSize != 0)
                 {
@@ -72,7 +72,7 @@ namespace OneByOne
                         Rect.Y -= Rect.Y % LevelManager.BlockSize;
                 }
             }
-            if (FacingDir == Direction.Bottom || FacingDir == Direction.Top || !Moving )
+            if (FacingDir == Direction.Down || FacingDir == Direction.Up || !Moving && !IsCapturing)
             {
                 if (Rect.X % LevelManager.BlockSize != 0)
                 {
@@ -87,11 +87,11 @@ namespace OneByOne
         {
             switch (FacingDir)
             {
-                case Direction.Top:
+                case Direction.Up:
                     Rect.Y -= Speed;
                     break;
 
-                case Direction.Bottom:
+                case Direction.Down:
                     Rect.Y += Speed;
                     break;
 
@@ -120,6 +120,29 @@ namespace OneByOne
         {
             return LevelManager.Field[(Rect.X + Rect.Width/2)/ LevelManager.BlockSize, (Rect.Y  + Rect.Height/2)/ LevelManager.BlockSize];
         }
+        public Block Next()
+        {
+            switch (FacingDir)
+            {
+                case Direction.Up:
+                    return LevelManager.Field[(Rect.X + Rect.Width / 2) / LevelManager.BlockSize,
+                        (Rect.Y + Rect.Height / 2) / LevelManager.BlockSize - 1];
+                case Direction.Down:
+                    return LevelManager.Field[(Rect.X + Rect.Width / 2) / LevelManager.BlockSize,
+                        (Rect.Y + Rect.Height / 2) / LevelManager.BlockSize + 1];
+                case Direction.Right:
+                    return LevelManager.Field[(Rect.X + Rect.Width / 2) / LevelManager.BlockSize + 1,
+                        (Rect.Y + Rect.Height / 2) / LevelManager.BlockSize];
+                case Direction.Left:
+                    return LevelManager.Field[(Rect.X + Rect.Width / 2) / LevelManager.BlockSize - 1,
+                        (Rect.Y + Rect.Height / 2) / LevelManager.BlockSize];
+            }
+            return null;
+        }
+        public void OnDeath()
+        {
+            LevelManager.Load();
+        }
         public override void Update()
         {
             UpdateState();
@@ -135,6 +158,8 @@ namespace OneByOne
                 IsCapturing = false;
                 LevelManager.TurnAllSelectedBlocksFilled();
             }
+            if (IsCapturing && Next().State == BlockState.Selected)
+                OnDeath();
 
         }
         public override void Draw(SpriteBatch SB)
