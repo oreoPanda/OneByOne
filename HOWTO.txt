@@ -1,0 +1,7 @@
+clone https://github.com/oreoPanda/OneByOne
+create a new Windows Game project called OneByOne
+close visual studio
+goto C:/Benutzer/Schüler/Dokumente/Visualstudio/Projects/OneByOne
+copy everything (OneByOne folder and project file)
+paste into where you cloned the code earlier (right-click next to the REAMDE.md and hit Paste)
+open the project, on the right side right-click, Hinzufügen, vorhandene Elemente, everything except for Game1.cs and Program.cs
