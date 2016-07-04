@@ -36,34 +36,42 @@ namespace OneByOne
             }
         }
 
+        /*This function allows to move into the walls one pixel (in one frame), which will not be visible to the user*/
         public Block Next()
         {
             switch (movingdir)
             {
                 case Direction.Up:
-                    return LevelManager.Field[(Rect.Y - LevelManager.BlockSize) / LevelManager.BlockSize,
-                        Rect.X / LevelManager.BlockSize];
+                    return LevelManager.Field[Rect.X / LevelManager.BlockSize,
+                        Rect.Y / LevelManager.BlockSize];
                 case Direction.Down:
-                    return LevelManager.Field[(Rect.Y + LevelManager.BlockSize) / LevelManager.BlockSize,
-                        Rect.X / LevelManager.BlockSize];
+                    return LevelManager.Field[Rect.X / LevelManager.BlockSize,
+                        (Rect.Y+Rect.Height) / LevelManager.BlockSize];
             }
             return null;
         }
 
         public override void Update()
         {
-            if (movingdir == Direction.Up)
+            if (Next().State == BlockState.Selected)
             {
-                if (Next().State == BlockState.Filled)
-                {
-                    movingdir = Direction.Down;
-                }
+                LevelManager.ThisPlayer.OnDeath();
             }
             else
             {
-                if (Next().State == BlockState.Filled)
+                if (movingdir == Direction.Up)
                 {
-                    movingdir = Direction.Up;
+                    if (Next().State == BlockState.Filled)
+                    {
+                        movingdir = Direction.Down;
+                    }
+                }
+                else
+                {
+                    if (Next().State == BlockState.Filled)
+                    {
+                        movingdir = Direction.Up;
+                    }
                 }
             }
 
